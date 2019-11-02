@@ -1,0 +1,98 @@
+---
+title: "The Tidy Text Format"
+author: "Clinton moshe"
+date: "11/1/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+Tidy data principles is a powerful way to make handling data in an easier way especially when dealing with text data types. As described by
+Hadley Wickham (Wickham 2014), tidy data has a specific structure: Each variable is a column, Each observation is a row and Each type of observational unit is a table.
+
+
+```{r cars}
+text <- c("Because I could not stop for Death -",
+          "He kindly stopped for me -",
+          "The Carriage held but just Ourselves -",
+          "and Immortality")
+text
+```
+## Converting text to a tidy format
+```{r}
+library(dplyr)
+library(tibble)
+text_df <- data_frame(line = 1:4, text = text)
+text_df
+```
+## tokenization
+```{r}
+library(tidytext)
+text_df %>% 
+  unnest_tokens(output=word, input=text)
+```
+## Tidying the Works of Jane Austen
+```{r}
+library(janeaustenr)
+library(stringr)
+original_books <- austen_books() %>%
+  # adding two new columns linenumber and chapter
+    group_by(book) %>% mutate(linenumber = row_number(),
+    chapter = cumsum(str_detect(text, regex("^chapter [\\divxlc]",
+    ignore_case = TRUE)))) %>%  ungroup()
+as_tibble(original_books)
+```
+## Tokenizing the text
+```{r}
+tidy_books = original_books %>%
+              unnest_tokens(output = word, input = text)
+tidy_books
+# COUNTING THE FREQUENCY OF THE WORDS
+tidy_books %>% 
+  count(word, sort = TRUE)
+```
+## Removing stop words e.g the, of , to etc
+```{r}
+data("stop_words")
+stop_words
+# removing stop words
+tidy_books = tidy_books %>% 
+              anti_join(stop_words)
+tidy_books
+
+# counting the most common words
+tidy_books %>% 
+      count(word, sort = TRUE)
+# counting the most common books
+tidy_books %>% 
+      count(book, sort = TRUE)
+# counting the number of chapters
+tidy_books %>% 
+      count(chapter, sort = FALSE)
+```
+## Visualizing the most common words
+```{r}
+library(ggplot2)
+tidy_books %>%
+  count(word, sort = TRUE) %>%
+  filter(n > 600) %>%
+  mutate(word = reorder(word, n)) %>%
+  ggplot(aes(word, n)) +
+  geom_col(fill='blue') +  xlab(NULL) + 
+  coord_flip() + ggtitle('Most common used words')
+```
+## Gutenbergr package
+
+
+## test chunk
+```{r}
+library(tidyverse)
+library(janeaustenr)
+janeaustenr::austen_books()[1:100,]
+austen_books() %>% group_by(book) %>% summarise(total_lines=n())
+# view(emma)
+```
+
