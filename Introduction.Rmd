@@ -89,11 +89,8 @@ tidy_books %>%
 
 ## test chunk
 ```{r}
-<<<<<<< HEAD
 library(tidyverse)
 library(janeaustenr)
-=======
->>>>>>> c55de0159076c7b7573ba970ca9093471996b07e
 janeaustenr::austen_books()[1:100,]
 austen_books() %>% group_by(book) %>% summarise(total_lines=n())
 # view(emma)
