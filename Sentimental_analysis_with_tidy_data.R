@@ -34,15 +34,25 @@ tidy_books = austen_books() %>%
 tidy_books
 
 # joy words using bing sentiment
-
+# positive words
 bing_positive = get_sentiments('bing') %>% 
   filter(sentiment=='positive')
 bing_positive
 
+# negative words
+bing_negative = get_sentiments('bing') %>% 
+  filter(sentiment=='negative')
+bing_negative
+
+# positive books
 tidy_books %>% filter(book =='Emma') %>% 
   inner_join(bing_positive, by='word') %>%
   count(word, sort = TRUE)
 
+# negative books
+tidy_books %>% filter(book =='Emma') %>% 
+  inner_join(bing_negative, by='word') %>%
+  count(word, sort = TRUE)
 ###
 library(tidyr)
 janeaustensentiment = tidy_books %>% 
@@ -50,6 +60,7 @@ janeaustensentiment = tidy_books %>%
   count(book, index=linenumber %/% 80, sentiment) %>%
   spread(sentiment, n, fill = 0) %>%
   mutate(sentiment = positive - negative)
+janeaustensentiment
 
 library(ggplot2)
 ggplot(janeaustensentiment, aes(index, sentiment, fill=book)) +
