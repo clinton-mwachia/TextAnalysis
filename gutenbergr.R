@@ -60,3 +60,10 @@ facet_wrap(~author, ncol = 2) +
   theme(legend.position = 'none') +
   labs(y = "Jane Austen", x = NULL)
   
+
+# correlation
+cor.test(data=frequency[frequency$author=='Bronte Sisters',],
+         ~proportion + `Jane Austen`)
+
+cor.test(data=frequency[frequency$author == 'H.G. Wells',],
+         ~ proportion +  `Jane Austen`)
